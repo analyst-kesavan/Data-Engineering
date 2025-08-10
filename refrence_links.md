@@ -10,4 +10,4 @@
    [Read on Medium](https://medium.com/@nishasreedharan/data-engineer-interview-preparation-complete-guide-98a9d16f6889)
 
 2. **Find the complete solution and explanation:** By Monty 
-   [Read on Medium]([https://lnkd.in/gsYwUsDV](https://medium.com/@montypoddar08/pyspark-interview-question-04-1de2b5274ae0))
+   [Read on Medium]((https://medium.com/@montypoddar08/pyspark-interview-question-04-1de2b5274ae0)
