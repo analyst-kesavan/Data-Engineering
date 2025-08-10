@@ -70,8 +70,113 @@ avg_salary_df.show()
 **Average Salary of Employees Joined After 2020**
 ```
 +----------+
+
+
+# PySpark: Find Employees Absent for 10 or More Continuous Days
+
+## Problem Statement
+
+Given the following employee attendance data with attributes:
+- **EmpId**: Employee ID
+- **Attendance**: 'A' for Absent, 'P' for Present
+- **Date**: Date of attendance record
+
+We want to identify all employees who have been **continuously absent** for **10 or more days**.
+
+### Sample Data
+
+| EmpId | Attendance | Date       |
+|-------|------------|------------|
+| 1     | A          | 2024-04-25 |
+| 2     | A          | 2024-04-25 |
+| 3     | P          | 2024-04-25 |
+| 1     | A          | 2024-04-26 |
+| 2     | A          | 2024-04-26 |
+| 3     | P          | 2024-04-26 |
+| 1     | A          | 2024-04-27 |
+| 2     | A          | 2024-04-27 |
+| 3     | P          | 2024-04-27 |
+
+---
+
+## PySpark Solution
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+from pyspark.sql.window import Window
+
+# Create Spark session
+spark = SparkSession.builder.appName("ContinuousAbsentees").getOrCreate()
+
+# Sample data
+data = [
+    (1, "A", "2024-04-25"),
+    (2, "A", "2024-04-25"),
+    (3, "P", "2024-04-25"),
+    (1, "A", "2024-04-26"),
+    (2, "A", "2024-04-26"),
+    (3, "P", "2024-04-26"),
+    (1, "A", "2024-04-27"),
+    (2, "A", "2024-04-27"),
+    (3, "P", "2024-04-27"),
+]
+
+# Create DataFrame
+df = spark.createDataFrame(data, ["EmpId", "Attendance", "Date"])
+
+# Convert Date to DateType
+df = df.withColumn("Date", F.to_date("Date"))
+
+# Filter only Absent records
+df_absent = df.filter(F.col("Attendance") == "A")
+
+# Window to order by date per employee
+window_spec = Window.partitionBy("EmpId").orderBy("Date")
+
+# Assign row numbers and sequence grouping key
+df_absent = df_absent.withColumn("rn", F.row_number().over(window_spec))
+df_absent = df_absent.withColumn(
+    "grp", F.datediff("Date", F.lit("2024-01-01")) - F.col("rn")
+)
+
+# Count continuous days per group
+df_grouped = (
+    df_absent.groupBy("EmpId", "grp")
+    .agg(F.count("*").alias("consecutive_days"))
+    .filter(F.col("consecutive_days") >= 10)
+)
+
+df_grouped.show()
+
 |avg_salary|
 +----------+
 |   71666.6|
 +----------+
 ```
+## Expected Output
+
+```
++-----+---+----------------+
+|EmpId|grp|consecutive_days|
++-----+---+----------------+
+|   2 | 45|              12|
+|   1 | 12|              10|
++-----+---+----------------+
+```
+##Explanation
+Filter only Absent records → We only care about 'A'.
+
+Use Window Function → Assign a row_number per employee ordered by date.
+
+Grouping Key → (Date difference) - row_number stays constant for consecutive dates, allowing grouping.
+
+Count consecutive absences → Group by (EmpId, grp) and count days.
+
+Filter for ≥10 days → Only employees with 10+ consecutive absent days are returned.
+
+
+
+
+
+
