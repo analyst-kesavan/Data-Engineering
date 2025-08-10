@@ -9,5 +9,5 @@
 1. **Read:** “Data Engineer Interview Preparation- Complete Guide” by Nisha Sreedharan on Medium  
    [Read on Medium](https://medium.com/@nishasreedharan/data-engineer-interview-preparation-complete-guide-98a9d16f6889)
 
-2. **Find the complete solution and explanation:** By Monty 
-   [Read on Medium]((https://medium.com/@montypoddar08/pyspark-interview-question-04-1de2b5274ae0)
+2. **Find the complete solution and explanation:** By Monty Poddar
+   [Read on Medium](https://medium.com/@montypoddar08/pyspark-interview-question-04-1de2b5274ae0)
